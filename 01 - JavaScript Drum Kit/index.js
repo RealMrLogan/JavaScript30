@@ -1,23 +1,19 @@
-const getKeyAndAudio = (keyCode) => {
-  try {
-    return document.querySelectorAll(`[data-key="${keyCode}"]`)
-  } catch (error) {
-    return [null, null]
-  }
-}
-
-const playSound = ({ keyCode }) => {
-  const [key, audio] = getKeyAndAudio(keyCode)
+// add the class and play sound
+const onKeyDown = ({ keyCode }) => {
+  const [key, audio] = document.querySelectorAll(`[data-key="${keyCode}"]`)
   if (key === undefined) return
-
-  if (parseInt(key.dataset.key, 10) === keyCode) {
-    key.classList.toggle('playing')
-    audio.play()
-  }
+    
+  key.classList.add('playing')
+  audio.currentTime = 0 // rewind to the start
+  audio.play()
 }
-
-// add the class and sound
-window.addEventListener('keydown', playSound)
 
 // remove the class
-window.addEventListener('keyup', playSound)
+const onTransitionEnd = (e) => {
+  if (e.propertyName !== 'transform') return
+  
+  e.target.classList.remove('playing')
+}
+
+window.addEventListener('keydown', onKeyDown)
+Array.from(document.querySelectorAll('.key')).forEach((key) => key.addEventListener('transitionend', onTransitionEnd))
